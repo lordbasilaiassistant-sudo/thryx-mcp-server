@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "thryx-protocol": {
+      "command": "npx",
+      "args": ["-y", "@thryx/mcp-server"],
+      "env": {
+        "THRYXTREASURY_PRIVATE_KEY": "your-private-key-here"
+      }
+    }
+  }
+}

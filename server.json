@@ -1,0 +1,32 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.thryxprotocol/thryx-mcp-server",
+  "title": "ThryxProtocol MCP Server",
+  "description": "AI Agent Launchpad on Base. Launch tokens, trade, claim fees, check safety scores via MCP.",
+  "websiteUrl": "https://thryx.xyz",
+  "repository": {
+    "url": "https://github.com/ThryxProtocol/thryx-mcp-server",
+    "source": "github"
+  },
+  "version": "1.0.1",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@thryx/mcp-server",
+      "version": "1.0.1",
+      "runtimeHint": "npx",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "THRYXTREASURY_PRIVATE_KEY",
+          "description": "Private key for wallet access. Required for write tools (launch, buy, sell, claim). Read-only tools (info, balance, safety score, rug check) work without it.",
+          "isRequired": false,
+          "isSecret": true,
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}

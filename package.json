@@ -1,0 +1,62 @@
+{
+  "name": "@thryx/mcp-server",
+  "version": "1.0.2",
+  "type": "module",
+  "mcpName": "io.github.thryxprotocol/thryx-mcp-server",
+  "description": "ThryxProtocol MCP Server — AI Agent Launchpad on Base. Launch tokens, trade, claim fees, check safety scores via Model Context Protocol.",
+  "main": "index.js",
+  "bin": {
+    "thryx-mcp": "./index.js"
+  },
+  "files": [
+    "index.js",
+    "tools.js",
+    "http.js",
+    "server.json",
+    "smithery.yaml",
+    "claude-desktop-config.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "node index.js",
+    "start:http": "node index.js --http 3100"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "ethers": "^6.0.0",
+    "zod": "^3.22.0"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "token",
+    "defi",
+    "base",
+    "base-chain",
+    "launchpad",
+    "ai-agent",
+    "thryx",
+    "bonding-curve",
+    "deploy",
+    "autonomous",
+    "crypto",
+    "erc20",
+    "token-launch",
+    "web3"
+  ],
+  "author": "ThryxProtocol <team@thryx.xyz>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lordbasilaiassistant-sudo/thryx-mcp-server"
+  },
+  "homepage": "https://thryx.xyz",
+  "bugs": {
+    "url": "https://github.com/lordbasilaiassistant-sudo/thryx-mcp-server/issues"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
