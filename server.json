@@ -1,19 +1,19 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.thryxprotocol/thryx-mcp-server",
+  "name": "io.github.lordbasilaiassistant-sudo/thryx-mcp-server",
   "title": "ThryxProtocol MCP Server",
-  "description": "AI Agent Launchpad on Base. Launch tokens, trade, claim fees, check safety scores via MCP.",
-  "websiteUrl": "https://thryx.xyz",
+  "description": "AI Agent Launchpad on Base. Launch tokens, trade on bonding curves, claim fees, check safety scores via MCP. 13 tools. Verified Diamond proxy (EIP-2535). $0.01 gas per launch. Early user THRYX rewards.",
+  "websiteUrl": "https://www.npmjs.com/package/@thryx/mcp-server",
   "repository": {
-    "url": "https://github.com/ThryxProtocol/thryx-mcp-server",
+    "url": "https://github.com/lordbasilaiassistant-sudo/thryx-mcp-server",
     "source": "github"
   },
-  "version": "1.0.1",
+  "version": "1.0.3",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@thryx/mcp-server",
-      "version": "1.0.1",
+      "version": "1.0.3",
       "runtimeHint": "npx",
       "transport": {
         "type": "stdio"

@@ -1,8 +1,8 @@
 {
   "name": "@thryx/mcp-server",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "type": "module",
-  "mcpName": "io.github.thryxprotocol/thryx-mcp-server",
+  "mcpName": "io.github.lordbasilaiassistant-sudo/thryx-mcp-server",
   "description": "ThryxProtocol MCP Server — AI Agent Launchpad on Base. Launch tokens, trade, claim fees, check safety scores via Model Context Protocol.",
   "main": "index.js",
   "bin": {
@@ -35,6 +35,7 @@
     "defi",
     "base",
     "base-chain",
+    "base-mainnet",
     "launchpad",
     "ai-agent",
     "thryx",
@@ -44,7 +45,15 @@
     "crypto",
     "erc20",
     "token-launch",
-    "web3"
+    "token-deploy",
+    "web3",
+    "blockchain",
+    "ethereum",
+    "evm",
+    "smart-contract",
+    "claude",
+    "cursor",
+    "ai-trading"
   ],
   "author": "ThryxProtocol <team@thryx.xyz>",
   "repository": {

@@ -4,7 +4,7 @@
  *
  * Wraps the existing toolkit scripts (scripts/toolkit/) so any AI agent
  * can launch tokens, buy, sell, claim fees, check info, and scan portfolios
- * on ThryxProtocol v2.1 (Base mainnet).
+ * on ThryxProtocol v2.4 Diamond (Base mainnet).
  *
  * Each tool spawns the corresponding CLI script as a child process with
  * --json --execute flags, parses stdout, and returns structured results.
@@ -27,7 +27,7 @@ const httpPort = httpFlag >= 0 ? parseInt(args[httpFlag + 1] || '3100', 10) : nu
 
 const server = new McpServer({
   name: 'thryx-protocol',
-  version: '1.0.1',
+  version: '1.0.3',
   description: 'ThryxProtocol v2.4 Diamond — The AI Agent Launchpad on Base. Launch tokens, trade, claim fees, check stats. Zero cost launches, 0.5% swap fees, bonding curve to AMM graduation.',
 });
 
@@ -37,7 +37,7 @@ registerAllTools(server);
 export function createSandboxServer() {
   const sandbox = new McpServer({
     name: 'thryx-protocol',
-    version: '1.0.1',
+    version: '1.0.3',
     description: 'ThryxProtocol v2.4 Diamond — The AI Agent Launchpad on Base.',
   });
   registerAllTools(sandbox);

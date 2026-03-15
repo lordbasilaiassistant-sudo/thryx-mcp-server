@@ -118,7 +118,7 @@ export function registerAllTools(server) {
 
   server.tool(
     'thryx_launch',
-    'Launch a new token on ThryxProtocol v2.4 Diamond (Base mainnet). Creates a bonding curve paired with THRYX. Supply: 1B tokens (80% curve, 15% graduation LP, 5% creator vested 90 days linear). Costs only gas (~$0.01). Token is tradeable immediately. Features: mandatory 10% slippage floor, referral support, fee burn, loyalty rebates, per-token ETH reserves.',
+    'Launch a new token on ThryxProtocol v2.4 Diamond (Base mainnet). Creates a bonding curve paired with THRYX. Supply: 1B tokens (80% curve, 15% graduation LP, 5% creator vested 90 days linear). Costs only gas (~$0.01). Token is tradeable immediately. BONUS: First 10 new users automatically receive THRYX rewards for launching. Features: mandatory 10% slippage floor, referral support, fee burn, loyalty rebates, per-token ETH reserves.',
     {
       name: z.string().describe('Token name (e.g. "Autonomous Agent Token")'),
       symbol: z.string().describe('Token ticker symbol (e.g. "AAT")'),
@@ -161,7 +161,7 @@ export function registerAllTools(server) {
 
   server.tool(
     'thryx_buy',
-    'Buy a token using ETH or THRYX via ThryxProtocol v2.4 Diamond. Handles approval automatically. 0.5% fee per trade (70% creator, 30% protocol). 20% of protocol fees burned. 10% slippage protection included.',
+    'Buy a token using ETH or THRYX via ThryxProtocol v2.4 Diamond. Handles approval automatically. 0.5% fee per trade (70% creator, 30% protocol). 20% of protocol fees burned. 10% slippage protection included. BONUS: First 10 new traders automatically receive THRYX rewards.',
     {
       token: z.string().describe('Token contract address to buy (0x...)'),
       amount: z.string().describe('Amount of input currency (e.g. "0.001" for 0.001 ETH, "10" for 10 THRYX)'),
@@ -464,18 +464,18 @@ export function registerAllTools(server) {
           supply: '1 billion tokens per launch',
           distribution: '80% bonding curve, 15% graduation LP reserve, 5% creator vested (90 days linear)',
           fees: '0.5% per swap (30% protocol, 70% creator)',
-          graduation: 'At 500M THRYX raised, migrates to Aerodrome V2 AMM',
+          graduation: 'At 500M THRYX raised, migrates to Uniswap V4 AMM with real liquidity',
           quoteToken: 'THRYX — all bonding curves are paired with THRYX',
         },
-        v2_2_features: {
-          graduationTreasuryCut: '0.5% of THRYX skimmed at graduation for protocol treasury',
-          protocolOwnedLP: '15% of graduation LP retained by protocol for perpetual Aerodrome fee income',
-          referralSystem: 'Creators set a referrer address; referrer earns 5% of protocol fee share',
-          milestonePerks: 'Owner can grant higher creator fee splits at milestones for creator retention',
-          linearVesting: '90-day linear vesting for creator tokens (replaces 7-day cliff)',
+        features: {
+          diamondProxy: 'EIP-2535 Diamond — same address forever, upgradeable facets, verified on Basescan',
+          autoDistribute: 'Creator and referral fees paid instantly on every swap — no claiming needed',
+          perTokenReserves: 'Each token has its own ETH reserves — safer graduation, no cross-token risk',
+          referralSystem: 'Referrers earn 5% of protocol fee share',
+          linearVesting: '90-day linear vesting for creator tokens',
           slippageFloor: 'Mandatory 10% slippage floor — auto-enforced if minOut is 0',
-          feeBurn: '20% of protocol fees burned permanently for deflationary THRYX pressure',
-          loyaltyRebates: 'Per-address fee discounts for ecosystem holders, set by owner',
+          feeBurn: '20% of protocol fees burned permanently — deflationary THRYX',
+          earlyUserRewards: 'First 10 external users automatically earn THRYX rewards for launching and trading — no claiming needed',
         },
         tools: [
           'thryx_launch — Deploy a new token on the bonding curve',

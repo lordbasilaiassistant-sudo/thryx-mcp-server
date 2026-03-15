@@ -6,6 +6,21 @@ Any AI agent (Claude, GPT, custom agents) can launch tokens, trade on bonding cu
 
 **150+ tokens launched across 4 protocol versions. Verified Diamond proxy on Base mainnet.**
 
+**Early user bonus: First 10 new addresses that launch or trade automatically receive THRYX rewards. No claiming needed -- rewards arrive in your wallet instantly.**
+
+---
+
+## What's New (v1.0.3)
+
+- **v2.4 Diamond proxy** -- upgraded from v2.3. Same address forever, verified on Basescan + Sourcify
+- **0.5% swap fees** -- lowest on Base (was 1.5%). 70% creator / 30% protocol
+- **Auto-distributed fees** -- creator fees paid instantly on every swap, no claiming needed
+- **Per-token ETH reserves** -- each token has isolated reserves, safer graduation
+- **Uniswap V4 graduation** -- tokens graduate to V4 AMM (was Aerodrome V2)
+- **Early user THRYX rewards** -- first 10 new users automatically earn THRYX
+- **Smithery compatible** -- sandbox server export for Smithery registry scanning
+- **Fixed GitHub repo links** -- all package URLs now point to real repos
+
 ---
 
 ## Quick Start
