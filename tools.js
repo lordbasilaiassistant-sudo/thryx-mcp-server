@@ -806,18 +806,22 @@ export function registerAllTools(server) {
 
         const types = {
           MetaLaunch: [
-            { name: 'creator', type: 'address' },
             { name: 'name', type: 'string' },
             { name: 'symbol', type: 'string' },
+            { name: 'user', type: 'address' },
             { name: 'nonce', type: 'uint256' },
+            { name: 'deadline', type: 'uint256' },
           ],
         };
 
+        const deadline = Math.floor(Date.now() / 1000) + 600; // 10 minutes
+
         const message = {
-          creator: signerAddress,
           name,
           symbol,
+          user: signerAddress,
           nonce,
+          deadline,
         };
 
         return okEnriched({
@@ -828,12 +832,12 @@ export function registerAllTools(server) {
           domain,
           types,
           message,
-          relayEndpoint: `${RELAY_URL}/meta-launch`,
+          relayEndpoint: `${RELAY_URL}/relay/launch`,
           relayPayload: {
-            creator: signerAddress,
             name,
             symbol,
-            nonce,
+            user: signerAddress,
+            deadline: deadline.toString(),
             signature: '<SIGN_AND_INSERT_HERE>',
           },
           instructions: [
