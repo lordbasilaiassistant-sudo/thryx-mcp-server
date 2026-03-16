@@ -27,8 +27,8 @@ const httpPort = httpFlag >= 0 ? parseInt(args[httpFlag + 1] || '3100', 10) : nu
 
 const server = new McpServer({
   name: 'thryx-protocol',
-  version: '1.0.3',
-  description: 'ThryxProtocol v2.4 Diamond — The AI Agent Launchpad on Base. Launch tokens, trade, claim fees, check stats. Zero cost launches, 0.5% swap fees, bonding curve to AMM graduation.',
+  version: '1.1.0',
+  description: 'ThryxProtocol v2.4 Diamond — The AI Agent Launchpad on Base. Launch tokens, buy/sell with ETH, gasless metaLaunch, paymaster-sponsored gas. Zero cost launches, 0.5% swap fees, bonding curve to AMM graduation.',
 });
 
 registerAllTools(server);
@@ -37,7 +37,7 @@ registerAllTools(server);
 export function createSandboxServer() {
   const sandbox = new McpServer({
     name: 'thryx-protocol',
-    version: '1.0.3',
+    version: '1.1.0',
     description: 'ThryxProtocol v2.4 Diamond — The AI Agent Launchpad on Base.',
   });
   registerAllTools(sandbox);

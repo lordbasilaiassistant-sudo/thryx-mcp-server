@@ -6,8 +6,8 @@
  * and returned to the MCP client. Stderr is captured for diagnostics.
  *
  * Tools:
- *   READ  — thryx_info, thryx_portfolio, thryx_balance, thryx_stats_v2
- *   WRITE — thryx_launch, thryx_buy, thryx_sell, thryx_claim, thryx_set_referrer, thryx_claim_referral
+ *   READ  — thryx_info, thryx_portfolio, thryx_balance, thryx_stats_v2, thryx_paymaster_stats
+ *   WRITE — thryx_launch, thryx_buy, thryx_sell, thryx_claim, thryx_set_referrer, thryx_claim_referral, thryx_meta_launch
  */
 import { z } from 'zod';
 import { execFile } from 'child_process';
@@ -161,11 +161,11 @@ export function registerAllTools(server) {
 
   server.tool(
     'thryx_buy',
-    'Buy a token using ETH or THRYX via ThryxProtocol v2.4 Diamond. Handles approval automatically. 0.5% fee per trade (70% creator, 30% protocol). 20% of protocol fees burned. 10% slippage protection included. BONUS: First 10 new traders automatically receive THRYX rewards.',
+    'Buy a token with ETH via ThryxProtocol v2.4 Diamond. Simple interface: send ETH, receive tokens. Protocol handles THRYX routing internally via V4 Doppler pool — real THRYX volume on every trade. 0.5% fee per trade (70% creator, 30% protocol). 20% of protocol fees burned. 10% slippage protection included. Also supports paying with THRYX directly. BONUS: First 10 new traders automatically receive THRYX rewards.',
     {
       token: z.string().describe('Token contract address to buy (0x...)'),
       amount: z.string().describe('Amount of input currency (e.g. "0.001" for 0.001 ETH, "10" for 10 THRYX)'),
-      with: z.enum(['thryx', 'eth']).default('thryx').describe('Pay with THRYX or ETH'),
+      with: z.enum(['thryx', 'eth']).default('eth').describe('Pay with ETH (default, simple) or THRYX'),
       wallet: z.string().default('main').describe('Wallet label or address'),
     },
     async ({ token, amount, with: currency, wallet }) => {
@@ -178,10 +178,10 @@ export function registerAllTools(server) {
           return okEnriched(json, {
             nextActions: [
               `Use thryx_info with token "${token}" to see updated curve state after your buy`,
-              `Use thryx_sell with token "${token}" to sell later (get THRYX or ETH back)`,
+              `Use thryx_sell with token "${token}" to sell later and receive ETH back`,
               `Use thryx_claim with token "${token}" if you are the creator to collect fees`,
             ],
-            hint: `Bought tokens on the bonding curve. Your tokens are in wallet "${wallet}". Sell anytime with thryx_sell.`,
+            hint: `Bought tokens on the bonding curve. Your tokens are in wallet "${wallet}". Sell anytime with thryx_sell to get ETH back.`,
           });
         }
 
@@ -200,7 +200,7 @@ export function registerAllTools(server) {
 
   server.tool(
     'thryx_sell',
-    'Sell a token via universal routing: ThryxProtocol v2 → Legacy Factory → Odos aggregator → Kyberswap. Includes partial-sell fallback (100% → 50% → 25% → 10%). Use "all" to sell entire balance.',
+    'Sell a token for ETH via ThryxProtocol v2.4 Diamond. Simple interface: send tokens, receive ETH. Protocol handles THRYX routing internally via V4 Doppler pool. Falls back to universal routing (Legacy Factory → Odos → Kyberswap) for non-Diamond tokens. Includes partial-sell fallback (100% → 50% → 25% → 10%). Use "all" to sell entire balance.',
     {
       token: z.string().describe('Token contract address to sell (0x...)'),
       amount: z.string().default('all').describe('Amount to sell (human-readable number) or "all" for full balance'),
@@ -448,7 +448,7 @@ export function registerAllTools(server) {
       return ok({
         name: 'ThryxProtocol v2.4 Diamond',
         tagline: 'The AI Agent Launchpad on Base',
-        description: 'Zero-cost token launchpad with bonding curves that graduate to real AMM liquidity. Built for AI agents to operate autonomously. Auto-distributes fees, 0.5% lowest fees on Base. Per-token ETH reserves, same CA forever via Diamond proxy.',
+        description: 'Zero-cost token launchpad with bonding curves that graduate to real AMM liquidity. Built for AI agents to operate autonomously. Auto-distributes fees, 0.5% lowest fees on Base. Per-token ETH reserves, same CA forever via Diamond proxy. Gasless launches via metaLaunch(). Simple buy()/sell() interface with ETH. Real THRYX volume on every trade via V4 Doppler pool. Dynamic ETH-denominated graduation threshold. Paymaster sponsors gas for new users.',
         network: 'Base mainnet (Chain ID 8453)',
         contracts: {
           protocol: '0x2F77b40c124645d25782CfBdfB1f54C1d76f2cCe',
@@ -459,16 +459,23 @@ export function registerAllTools(server) {
           thryx: '0xc07E889e1816De2708BF718683e52150C20F3BA3',
           weth: '0x4200000000000000000000000000000000000006',
         },
+        relay: 'https://thryx-relay.thryx.workers.dev',
         mechanics: {
-          launchCost: 'Gas only (~$0.01 on Base)',
+          launchCost: 'Gas only (~$0.01 on Base), or FREE via gasless metaLaunch() through the relay',
           supply: '1 billion tokens per launch',
           distribution: '80% bonding curve, 15% graduation LP reserve, 5% creator vested (90 days linear)',
           fees: '0.5% per swap (30% protocol, 70% creator)',
-          graduation: 'At 500M THRYX raised, migrates to Uniswap V4 AMM with real liquidity',
+          graduation: 'Dynamic ETH-denominated threshold — migrates to Uniswap V4 AMM with real liquidity and real THRYX volume via Doppler pool',
           quoteToken: 'THRYX — all bonding curves are paired with THRYX',
+          buyAndSell: 'Simple buy(token, amount) and sell(token, amount) interface — send ETH, receive tokens (or vice versa). Protocol handles THRYX routing internally.',
         },
         features: {
           diamondProxy: 'EIP-2535 Diamond — same address forever, upgradeable facets, verified on Basescan',
+          gaslessLaunches: 'metaLaunch() lets users sign a message off-chain, relay submits the tx and pays gas. Zero ETH needed to launch.',
+          paymasterGas: 'Paymaster contract sponsors gas for new users — holds ETH and THRYX reserves to cover transactions',
+          buyAndSell: 'buy(token) and sell(token, amount) — simple ETH-native interface. No need to acquire THRYX first.',
+          realThryxVolume: 'Every buy/sell generates real THRYX volume on the V4 Doppler pool — genuine liquidity, not virtual',
+          dynamicGraduation: 'Graduation threshold is ETH-denominated and converts to THRYX at market rate — adjusts automatically',
           autoDistribute: 'Creator and referral fees paid instantly on every swap — no claiming needed',
           perTokenReserves: 'Each token has its own ETH reserves — safer graduation, no cross-token risk',
           referralSystem: 'Referrers earn 5% of protocol fee share',
@@ -479,8 +486,10 @@ export function registerAllTools(server) {
         },
         tools: [
           'thryx_launch — Deploy a new token on the bonding curve',
-          'thryx_buy — Buy tokens with ETH or THRYX',
-          'thryx_sell — Sell tokens (universal routing: Protocol > Factory > Odos > Kyberswap)',
+          'thryx_buy — Buy tokens with ETH (simple interface: send ETH, get tokens)',
+          'thryx_sell — Sell tokens for ETH (simple interface: send tokens, get ETH)',
+          'thryx_meta_launch — Gasless token launch via metaLaunch() (returns signing data for relay submission)',
+          'thryx_paymaster_stats — Check paymaster ETH/THRYX balance and sponsorship capacity',
           'thryx_claim — Claim creator or protocol fees',
           'thryx_set_referrer — Set referrer address for a token (v2.4)',
           'thryx_claim_referral — Claim accumulated referral fees (v2.4)',
@@ -510,7 +519,7 @@ export function registerAllTools(server) {
     },
     async ({ token, referrer, wallet: walletArg }) => {
       try {
-        const PROTOCOL_V2_3 = '0x2F77b40c124645d25782CfBdfB1f54C1d76f2cCe';
+        const PROTOCOL_V2_4 = '0x2F77b40c124645d25782CfBdfB1f54C1d76f2cCe';
         const SET_REFERRER_ABI = ['function setReferrer(address referrer) external'];
         const RPC_URL = 'https://mainnet.base.org';
         const CHAIN_ID = 8453;
@@ -534,7 +543,7 @@ export function registerAllTools(server) {
           return err(`Failed to load wallet: ${e.message}`);
         }
 
-        const protocol = new ethers.Contract(PROTOCOL_V2_3, SET_REFERRER_ABI, signer);
+        const protocol = new ethers.Contract(PROTOCOL_V2_4, SET_REFERRER_ABI, signer);
         const tx = await protocol.setReferrer(referrer);
         const receipt = await tx.wait();
 
@@ -564,7 +573,7 @@ export function registerAllTools(server) {
     },
     async ({ wallet: walletArg }) => {
       try {
-        const PROTOCOL_V2_3 = '0x2F77b40c124645d25782CfBdfB1f54C1d76f2cCe';
+        const PROTOCOL_V2_4 = '0x2F77b40c124645d25782CfBdfB1f54C1d76f2cCe';
         const CLAIM_REFERRAL_ABI = [
           'function claimReferralFees() external',
           'function referralFees(address) view returns (uint256)',
@@ -591,7 +600,7 @@ export function registerAllTools(server) {
           return err(`Failed to load wallet: ${e.message}`);
         }
 
-        const protocol = new ethers.Contract(PROTOCOL_V2_3, CLAIM_REFERRAL_ABI, signer);
+        const protocol = new ethers.Contract(PROTOCOL_V2_4, CLAIM_REFERRAL_ABI, signer);
 
         // Check pending referral fees first
         const pendingFees = await protocol.referralFees(signer.address);
@@ -631,19 +640,21 @@ export function registerAllTools(server) {
     {},
     async () => {
       try {
-        const PROTOCOL_V2_3 = '0x2F77b40c124645d25782CfBdfB1f54C1d76f2cCe';
-        const STATS_ABI = ['function getProtocolStatsV2() view returns (uint256 totalBurned, uint256 totalGraduationTreasuryCollected)'];
+        const PROTOCOL_V2_4 = '0x2F77b40c124645d25782CfBdfB1f54C1d76f2cCe';
+        const STATS_ABI = ['function getProtocolStats() view returns (uint256 launched, uint256 graduated, uint256 lifetimeFees, uint256 thryxReserves, uint256 ethReserves, uint256 ethRate, uint256 thryxBurned, uint256 gradTreasuryCollected)'];
         const RPC_URL = 'https://mainnet.base.org';
         const CHAIN_ID = 8453;
 
         const provider = new ethers.JsonRpcProvider(RPC_URL, CHAIN_ID, { staticNetwork: true });
-        const protocol = new ethers.Contract(PROTOCOL_V2_3, STATS_ABI, provider);
+        const protocol = new ethers.Contract(PROTOCOL_V2_4, STATS_ABI, provider);
 
-        const [totalBurned, totalGraduationTreasuryCollected] = await protocol.getProtocolStatsV2();
+        const stats = await protocol.getProtocolStats();
+        const totalBurned = stats.thryxBurned;
+        const totalGraduationTreasuryCollected = stats.gradTreasuryCollected;
 
         return ok({
           success: true,
-          protocol: PROTOCOL_V2_3,
+          protocol: PROTOCOL_V2_4,
           version: 'v2.4',
           stats: {
             totalThryxBurned: ethers.formatEther(totalBurned),
@@ -727,6 +738,180 @@ export function registerAllTools(server) {
         }
 
         return ok(result.stdout || 'Rug check completed (no JSON output)');
+      } catch (e) {
+        return err(e.message);
+      }
+    }
+  );
+
+  // ═══════════════════════════════════════════════════════════════════
+  // thryx_meta_launch — Gasless token launch via metaLaunch()
+  // ═══════════════════════════════════════════════════════════════════
+
+  server.tool(
+    'thryx_meta_launch',
+    'Get signing data for a gasless token launch via metaLaunch(). The user signs a message off-chain and the relay at https://thryx-relay.thryx.workers.dev submits the transaction and pays gas. Zero ETH needed to launch. Returns the message to sign and the relay endpoint to submit to.',
+    {
+      name: z.string().describe('Token name (e.g. "Autonomous Agent Token")'),
+      symbol: z.string().describe('Token ticker symbol (e.g. "AAT")'),
+      wallet: z.string().default('main').describe('Wallet label or address (the creator/signer)'),
+    },
+    async ({ name, symbol, wallet: walletArg }) => {
+      try {
+        const PROTOCOL = '0x2F77b40c124645d25782CfBdfB1f54C1d76f2cCe';
+        const RELAY_URL = 'https://thryx-relay.thryx.workers.dev';
+        const RPC_URL = 'https://mainnet.base.org';
+        const CHAIN_ID = 8453;
+
+        const provider = new ethers.JsonRpcProvider(RPC_URL, CHAIN_ID, { staticNetwork: true });
+        let signerAddress;
+
+        if (walletArg.startsWith('0x') && walletArg.length === 42) {
+          signerAddress = walletArg;
+        } else {
+          try {
+            const { readFileSync } = await import('fs');
+            const walletsPath = resolve(PROJECT_ROOT, 'wallets.json');
+            const wallets = JSON.parse(readFileSync(walletsPath, 'utf8'));
+            const match = wallets.find(w => (w.label || '').toLowerCase().includes(walletArg.toLowerCase()));
+            if (match) {
+              signerAddress = match.address;
+            }
+          } catch {
+            // wallets.json not found
+          }
+
+          if (!signerAddress) {
+            return err(`Wallet "${walletArg}" not found. Pass a 0x address directly, or ensure wallets.json exists.`);
+          }
+        }
+
+        // Get the current nonce for the signer from the protocol
+        let nonce = 0;
+        try {
+          const nonceAbi = ['function metaLaunchNonces(address) view returns (uint256)'];
+          const protocol = new ethers.Contract(PROTOCOL, nonceAbi, provider);
+          nonce = Number(await protocol.metaLaunchNonces(signerAddress));
+        } catch {
+          // If nonce function doesn't exist yet, default to 0
+        }
+
+        // Compute the EIP-712 domain and message for metaLaunch signing
+        const domain = {
+          name: 'ThryxProtocol',
+          version: '1',
+          chainId: CHAIN_ID,
+          verifyingContract: PROTOCOL,
+        };
+
+        const types = {
+          MetaLaunch: [
+            { name: 'creator', type: 'address' },
+            { name: 'name', type: 'string' },
+            { name: 'symbol', type: 'string' },
+            { name: 'nonce', type: 'uint256' },
+          ],
+        };
+
+        const message = {
+          creator: signerAddress,
+          name,
+          symbol,
+          nonce,
+        };
+
+        return okEnriched({
+          success: true,
+          action: 'metaLaunch',
+          description: 'Sign this EIP-712 typed data with your wallet, then POST the signature to the relay endpoint.',
+          signerAddress,
+          domain,
+          types,
+          message,
+          relayEndpoint: `${RELAY_URL}/meta-launch`,
+          relayPayload: {
+            creator: signerAddress,
+            name,
+            symbol,
+            nonce,
+            signature: '<SIGN_AND_INSERT_HERE>',
+          },
+          instructions: [
+            'Step 1: Sign the EIP-712 typed data above using ethers.js signTypedData(domain, types, message) or your wallet provider',
+            'Step 2: POST to the relay endpoint with the relayPayload (replace signature placeholder with actual signature)',
+            'Step 3: The relay submits the metaLaunch() transaction and pays gas on your behalf',
+            'Step 4: You receive the token address in the relay response — your token is live!',
+          ],
+        }, {
+          nextActions: [
+            'Sign the typed data with your wallet and submit to the relay',
+            'After launch, use thryx_info with the returned token address to check the bonding curve',
+          ],
+          hint: 'Gasless launch — the relay pays gas. You just sign a message.',
+        });
+      } catch (e) {
+        return err(e.message);
+      }
+    }
+  );
+
+  // ═══════════════════════════════════════════════════════════════════
+  // thryx_paymaster_stats — Check paymaster balance and capacity
+  // ═══════════════════════════════════════════════════════════════════
+
+  server.tool(
+    'thryx_paymaster_stats',
+    'Check the ThryxProtocol paymaster contract balance and gas sponsorship capacity. The paymaster holds ETH to sponsor gas for new users (gasless launches and trades). Shows ETH balance, THRYX balance, and estimated number of sponsored transactions remaining.',
+    {},
+    async () => {
+      try {
+        const PROTOCOL = '0x2F77b40c124645d25782CfBdfB1f54C1d76f2cCe';
+        const THRYX = '0xc07E889e1816De2708BF718683e52150C20F3BA3';
+        const RPC_URL = 'https://mainnet.base.org';
+        const CHAIN_ID = 8453;
+        const BALANCE_ABI = ['function balanceOf(address) view returns (uint256)'];
+
+        // Read paymaster address from protocol
+        const PAYMASTER_ABI = ['function paymaster() view returns (address)'];
+
+        const provider = new ethers.JsonRpcProvider(RPC_URL, CHAIN_ID, { staticNetwork: true });
+
+        let paymasterAddress;
+        try {
+          const protocol = new ethers.Contract(PROTOCOL, PAYMASTER_ABI, provider);
+          paymasterAddress = await protocol.paymaster();
+        } catch {
+          // If paymaster() doesn't exist on-chain yet, use the protocol itself as a fallback
+          paymasterAddress = PROTOCOL;
+        }
+
+        const [ethBalance, thryxBalance] = await Promise.all([
+          provider.getBalance(paymasterAddress),
+          new ethers.Contract(THRYX, BALANCE_ABI, provider).balanceOf(paymasterAddress),
+        ]);
+
+        // Estimate capacity: average launch costs ~920K gas, ~0.006 gwei on Base
+        // Each tx costs approx 0.000006 ETH (6e-6 ETH) at 0.006 gwei
+        const estGasPerTx = 0.000006; // ETH per launch tx at typical Base gas prices
+        const ethBal = parseFloat(ethers.formatEther(ethBalance));
+        const estimatedLaunchesRemaining = Math.floor(ethBal / estGasPerTx);
+
+        return ok({
+          success: true,
+          paymaster: paymasterAddress,
+          protocol: PROTOCOL,
+          balances: {
+            ETH: ethers.formatEther(ethBalance),
+            THRYX: ethers.formatEther(thryxBalance),
+          },
+          capacity: {
+            estimatedLaunchesRemaining,
+            estimatedSwapsRemaining: Math.floor(ethBal / (estGasPerTx * 0.3)), // swaps are ~30% of launch gas
+            note: 'Estimates based on typical Base gas prices (~0.006 gwei). Actual capacity may vary.',
+          },
+          description: 'The paymaster sponsors gas for gasless metaLaunch() and new user transactions. Funded by protocol revenue.',
+          relay: 'https://thryx-relay.thryx.workers.dev',
+        });
       } catch (e) {
         return err(e.message);
       }
