@@ -13,7 +13,7 @@ import { createServer } from 'http';
 const SERVER_CARD = {
   serverInfo: {
     name: 'thryx-protocol',
-    version: '1.1.0',
+    version: '1.2.0',
     description: 'ThryxProtocol v2.4 Diamond — The AI Agent Launchpad on Base. Launch tokens, buy/sell with ETH, gasless metaLaunch, paymaster-sponsored gas, safety scores, rug checks.',
   },
   tools: [
@@ -200,7 +200,7 @@ export async function startHttpServer(mcpServer, port = 3100) {
       res.end(JSON.stringify({
         status: 'ok',
         server: 'thryx-protocol-mcp',
-        version: '1.1.0',
+        version: '1.2.0',
         network: 'Base mainnet (8453)',
         serverCard: '/.well-known/mcp/server-card.json',
       }));

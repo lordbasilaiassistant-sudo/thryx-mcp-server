@@ -2,26 +2,26 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.lordbasilaiassistant-sudo/thryx-mcp-server",
   "title": "ThryxProtocol MCP Server",
-  "description": "AI Agent Launchpad on Base. 15 MCP tools: launch, buy/sell, gasless deploy, safety scores.",
+  "description": "AI Agent Launchpad on Base. 15 MCP tools: launch tokens, buy/sell with ETH, gasless deploy, safety scores, portfolio scanning.",
   "websiteUrl": "https://www.npmjs.com/package/@thryx/mcp-server",
   "repository": {
     "url": "https://github.com/lordbasilaiassistant-sudo/thryx-mcp-server",
     "source": "github"
   },
-  "version": "1.1.0",
+  "version": "1.2.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@thryx/mcp-server",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "runtimeHint": "npx",
       "transport": {
         "type": "stdio"
       },
       "environmentVariables": [
         {
-          "name": "THRYXTREASURY_PRIVATE_KEY",
-          "description": "Private key for wallet access. Required for write tools (launch, buy, sell, claim). Read-only tools (info, balance, safety score, rug check) work without it.",
+          "name": "PRIVATE_KEY",
+          "description": "Your wallet private key (optional). Needed for write tools (launch, buy, sell, claim). Gasless launches still sign with your key but need no ETH — relay pays gas. Read tools work without it.",
           "isRequired": false,
           "isSecret": true,
           "format": "string"

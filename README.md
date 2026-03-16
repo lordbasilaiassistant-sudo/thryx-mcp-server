@@ -10,7 +10,7 @@ Any AI agent (Claude, GPT, custom agents) can launch tokens, trade on bonding cu
 
 ---
 
-## What's New (v1.1.0)
+## What's New (v1.2.0)
 
 - **Gasless launches via metaLaunch()** -- sign a message, relay pays gas. Zero ETH needed to launch a token.
 - **Simple buy()/sell() interface** -- send ETH to buy tokens, sell tokens to receive ETH. No need to acquire THRYX first.
@@ -18,8 +18,8 @@ Any AI agent (Claude, GPT, custom agents) can launch tokens, trade on bonding cu
 - **Dynamic graduation threshold** -- ETH-denominated, auto-converts to THRYX at market rate
 - **Paymaster gas sponsorship** -- paymaster contract holds ETH/THRYX to cover gas for new users
 - **Relay** -- https://thryx-relay.thryx.workers.dev for gasless operations
-- **4 new tools** -- thryx_meta_launch, thryx_paymaster_stats, plus updated thryx_buy/thryx_sell for ETH-native trading
-- **17 total tools** -- up from 13
+- **2 new tools** -- thryx_meta_launch, thryx_paymaster_stats
+- **15 total tools** -- up from 13
 
 ### Previous (v1.0.3)
 
@@ -62,7 +62,7 @@ Add to your `claude_desktop_config.json`:
       "command": "npx",
       "args": ["-y", "@thryx/mcp-server"],
       "env": {
-        "THRYXTREASURY_PRIVATE_KEY": "your-private-key-here"
+        "PRIVATE_KEY": "your-wallet-private-key"
       }
     }
   }
@@ -96,7 +96,7 @@ Endpoints:
 
 ---
 
-## Tools (17 total)
+## Tools (15 total)
 
 ### Read Tools (no wallet needed)
 
@@ -189,9 +189,11 @@ Discovers tokens via Blockscout, reads balances via Multicall3, prices via DexSc
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `THRYXTREASURY_PRIVATE_KEY` | For write tools | Private key for the default wallet. Read tools work without it. |
+| `PRIVATE_KEY` | Optional | Your wallet's private key. Needed for all write tools (launch, buy, sell, claim). Gasless launches still require signing but no ETH for gas. Read tools work without it. |
 
-Write tools (`thryx_launch`, `thryx_buy`, `thryx_sell`, `thryx_claim`, `thryx_set_referrer`, `thryx_claim_referral`) need wallet access. `thryx_meta_launch` only needs a wallet address (not private key) since signing happens client-side. Read tools (`thryx_info`, `thryx_balance`, `thryx_portfolio`, `thryx_stats_v2`, `thryx_safety_score`, `thryx_rug_check`, `thryx_paymaster_stats`, `thryx_about`) query Base mainnet RPC directly and require no configuration.
+**Gasless launches require no ETH.** Your wallet signs an EIP-712 message (needs private key), then the relay submits and the self-funding paymaster covers gas. The relay is self-sufficient — funded by 20% of all swap fees.
+
+Write tools (`thryx_launch`, `thryx_buy`, `thryx_sell`, `thryx_claim`, `thryx_set_referrer`, `thryx_claim_referral`) need wallet access for direct on-chain transactions. Read tools (`thryx_info`, `thryx_balance`, `thryx_portfolio`, `thryx_stats_v2`, `thryx_safety_score`, `thryx_rug_check`, `thryx_paymaster_stats`, `thryx_about`) query Base mainnet RPC directly and require no configuration.
 
 ---
 
@@ -202,7 +204,7 @@ Every token launched through ThryxProtocol:
 1. **Creates a bonding curve** -- virtual x*y=k curve paired with THRYX as the quote token
 2. **Tradeable immediately** -- buy/sell with ETH via simple `buy()`/`sell()` functions, no DEX listing needed
 3. **Generates real volume** -- every trade routes through the V4 Doppler pool, generating real THRYX volume
-4. **Generates fees** -- 0.5% per swap (30% protocol, 70% creator). 20% of protocol fees are burned
+4. **Generates fees** -- 0.5% per swap (30% protocol, 70% creator). 2% of protocol fees are burned
 5. **Graduates to AMM** -- at dynamic ETH-denominated threshold, migrates to Uniswap V4 with real liquidity
 6. **Locks THRYX** -- every launch permanently locks THRYX in the bonding curve = scarcity
 
@@ -223,7 +225,7 @@ Every token launched through ThryxProtocol:
 - Referral system: referrers earn 5% of protocol fee share
 - 90-day linear vesting for creator tokens
 - Mandatory 10% slippage floor
-- 20% fee burn for deflationary THRYX pressure
+- 2% fee burn for deflationary THRYX pressure
 - Loyalty rebates for ecosystem holders
 
 ---
@@ -234,7 +236,8 @@ Every token launched through ThryxProtocol:
 |--|--|
 | **Chain** | Base mainnet (Chain ID 8453) |
 | **Protocol v2.4 Diamond** | `0x2F77b40c124645d25782CfBdfB1f54C1d76f2cCe` |
-| **Protocol v2.2** | `0xcDC734c1AFC2822E0d7E332DC914c0a7311633bF` |
+| **Protocol v2.3 (legacy)** | `0x4f25b9ecC67dC597f35abaE6Fa495457EC82284B` |
+| **Protocol v2.2 (legacy)** | `0xcDC734c1AFC2822E0d7E332DC914c0a7311633bF` |
 | **THRYX Token** | `0xc07E889e1816De2708BF718683e52150C20F3BA3` |
 | **RPC** | `https://mainnet.base.org` |
 | **Explorer** | [basescan.org](https://basescan.org) |

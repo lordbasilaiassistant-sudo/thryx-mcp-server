@@ -1,19 +1,20 @@
 # Smithery MCP Registry configuration
-# Submit at: https://smithery.ai/submit
+# Publish: smithery mcp publish --name @thryx/mcp-server --transport stdio
+# Or hosted: smithery mcp publish --name @thryx/mcp-server
 startCommand:
   type: stdio
   configSchema:
     type: object
     properties:
-      THRYXTREASURY_PRIVATE_KEY:
+      PRIVATE_KEY:
         type: string
-        description: "Private key for wallet access (required for write tools: launch, buy, sell, claim). Read tools work without it."
+        description: "Your wallet private key (optional). Needed for write tools (launch, buy, sell, claim). Gasless launches sign with your key but need no ETH — relay pays gas. Read tools work without it."
     required: []
   commandFunction: |-
     (config) => ({
       command: "npx",
       args: ["-y", "@thryx/mcp-server"],
       env: {
-        THRYXTREASURY_PRIVATE_KEY: config.THRYXTREASURY_PRIVATE_KEY || ""
+        PRIVATE_KEY: config.PRIVATE_KEY || ""
       }
     })

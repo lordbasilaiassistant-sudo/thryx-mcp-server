@@ -1,6 +1,6 @@
 {
   "name": "@thryx/mcp-server",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "type": "module",
   "mcpName": "io.github.lordbasilaiassistant-sudo/thryx-mcp-server",
   "description": "ThryxProtocol MCP Server — AI Agent Launchpad on Base. Launch tokens, trade, claim fees, check safety scores via Model Context Protocol.",

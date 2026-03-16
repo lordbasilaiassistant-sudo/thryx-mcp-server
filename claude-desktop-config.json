@@ -4,7 +4,7 @@
       "command": "npx",
       "args": ["-y", "@thryx/mcp-server"],
       "env": {
-        "THRYXTREASURY_PRIVATE_KEY": "your-private-key-here"
+        "PRIVATE_KEY": "your-wallet-private-key"
       }
     }
   }
