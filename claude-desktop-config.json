@@ -1,10 +1,11 @@
 {
+  "_comment": "Drop this into ~/Library/Application Support/Claude/claude_desktop_config.json (Mac) or %APPDATA%\\Claude\\claude_desktop_config.json (Windows). The THRYX_API_KEY block is optional — leave it out and the package auto-registers a fresh wallet on first run.",
   "mcpServers": {
-    "thryx-protocol": {
+    "thryx": {
       "command": "npx",
       "args": ["-y", "@thryx/mcp-server"],
       "env": {
-        "PRIVATE_KEY": "your-wallet-private-key"
+        "THRYX_API_KEY": "thryx_your_key_here_or_leave_blank_for_auto_register"
       }
     }
   }

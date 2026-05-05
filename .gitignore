@@ -1,0 +1,11 @@
+node_modules/
+.env
+.env.local
+.thryx-mcp/
+credentials.json
+*.log
+
+# scratch / investigation artifacts (not deliverables)
+peek-reads.js
+smoke-test-writes.js
+tools.v1.4.0-stale.js

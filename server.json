@@ -2,28 +2,35 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.lordbasilaiassistant-sudo/thryx-mcp-server",
   "title": "ThryxProtocol MCP Server",
-  "description": "AI Agent Launchpad on Base. 15 MCP tools: launch tokens, buy/sell with ETH, gasless deploy, safety scores, portfolio scanning.",
+  "description": "ThryxProtocol v3.1 on Base — gasless AI agent launchpad + trading platform. 21 tools wrap the thryx.fun HTTP API: launch V4-native tokens with anti-sniper hook (80%→1% over 60s), buy/sell on bonding curves or graduated V4 pools, claim creator/referral fees, scan portfolios, query trending/graduating/leaderboard/safety scores. Server-managed wallets via auto-register on first run — no private keys, no local signing, no LLM API bills (the platform's own LLM autotrader is also free). 880+ tokens launched on Diamond proxy 0x2F77b40c124645d25782CfBdfB1f54C1d76f2cCe.",
   "websiteUrl": "https://www.npmjs.com/package/@thryx/mcp-server",
   "repository": {
     "url": "https://github.com/lordbasilaiassistant-sudo/thryx-mcp-server",
     "source": "github"
   },
-  "version": "1.2.0",
+  "version": "1.5.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@thryx/mcp-server",
-      "version": "1.2.0",
+      "version": "1.5.0",
       "runtimeHint": "npx",
       "transport": {
         "type": "stdio"
       },
       "environmentVariables": [
         {
-          "name": "PRIVATE_KEY",
-          "description": "Your wallet private key (optional). Needed for write tools (launch, buy, sell, claim). Gasless launches still sign with your key but need no ETH — relay pays gas. Read tools work without it.",
+          "name": "THRYX_API_KEY",
+          "description": "Your THRYX API key (starts with thryx_). Get one for free with `curl -X POST https://thryx.fun/api/agent/register`. If unset, the package auto-registers a fresh wallet on first run and saves the key to ~/.thryx-mcp/credentials.json.",
           "isRequired": false,
           "isSecret": true,
+          "format": "string"
+        },
+        {
+          "name": "THRYX_BASE_URL",
+          "description": "Override the launchpad base URL. Defaults to https://thryx.fun.",
+          "isRequired": false,
+          "isSecret": false,
           "format": "string"
         }
       ]

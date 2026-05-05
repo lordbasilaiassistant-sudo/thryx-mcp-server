@@ -1,4 +1,4 @@
-# Smithery MCP Registry configuration
+# Smithery MCP Registry configuration — @thryx/mcp-server v1.5.0
 # Publish: smithery mcp publish --name @thryx/mcp-server --transport stdio
 # Or hosted: smithery mcp publish --name @thryx/mcp-server
 startCommand:
@@ -6,15 +6,19 @@ startCommand:
   configSchema:
     type: object
     properties:
-      PRIVATE_KEY:
+      THRYX_API_KEY:
         type: string
-        description: "Your wallet private key (optional). Needed for write tools (launch, buy, sell, claim). Gasless launches sign with your key but need no ETH — relay pays gas. Read tools work without it."
+        description: "Your THRYX API key (starts with thryx_). Optional — if unset, the package auto-registers a fresh wallet on first run via POST https://thryx.fun/api/agent/register and saves the key to ~/.thryx-mcp/credentials.json. Read tools work either way."
+      THRYX_BASE_URL:
+        type: string
+        description: "Override the launchpad base URL. Defaults to https://thryx.fun."
     required: []
   commandFunction: |-
     (config) => ({
       command: "npx",
       args: ["-y", "@thryx/mcp-server"],
       env: {
-        PRIVATE_KEY: config.PRIVATE_KEY || ""
+        THRYX_API_KEY: config.THRYX_API_KEY || "",
+        THRYX_BASE_URL: config.THRYX_BASE_URL || "",
       }
     })

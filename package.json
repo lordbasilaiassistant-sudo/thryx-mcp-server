@@ -1,9 +1,9 @@
 {
   "name": "@thryx/mcp-server",
-  "version": "1.2.0",
+  "version": "1.5.0",
   "type": "module",
   "mcpName": "io.github.lordbasilaiassistant-sudo/thryx-mcp-server",
-  "description": "ThryxProtocol MCP Server — AI Agent Launchpad on Base. Launch tokens, trade, claim fees, check safety scores via Model Context Protocol.",
+  "description": "ThryxProtocol v3.1 MCP Server — gasless AI agent launchpad + trading platform on Base. 21 tools wrapping the thryx.fun HTTP API. Server-managed wallets, paymaster gas, free LLM-driven autotrader. No private keys, no signing, no API bills. Auto-registers on first run.",
   "main": "index.js",
   "bin": {
     "thryx-mcp": "./index.js"
@@ -20,11 +20,11 @@
   ],
   "scripts": {
     "start": "node index.js",
-    "start:http": "node index.js --http 3100"
+    "start:http": "node index.js --http 3100",
+    "smoke": "node smoke-test.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.1",
-    "ethers": "^6.0.0",
     "zod": "^3.22.0"
   },
   "keywords": [
@@ -40,7 +40,11 @@
     "ai-agent",
     "thryx",
     "bonding-curve",
-    "deploy",
+    "v4-native",
+    "anti-sniper",
+    "uniswap-v4",
+    "gasless",
+    "paymaster",
     "autonomous",
     "crypto",
     "erc20",
@@ -53,16 +57,17 @@
     "smart-contract",
     "claude",
     "cursor",
+    "elizaos",
     "ai-trading"
   ],
-  "author": "ThryxProtocol <team@thryx.xyz>",
+  "author": "ThryxProtocol <lordbasilaiassistant@gmail.com>",
   "repository": {
     "type": "git",
     "url": "https://github.com/lordbasilaiassistant-sudo/thryx-mcp-server"
   },
-  "homepage": "https://thryx.xyz",
+  "homepage": "https://thryx.fun",
   "bugs": {
-    "url": "https://github.com/lordbasilaiassistant-sudo/thryx-mcp-server/issues"
+    "url": "https://github.com/lordbasilaiassistant-sudo/thryx-launchpad/issues"
   },
   "license": "MIT",
   "engines": {

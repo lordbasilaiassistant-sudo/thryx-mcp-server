@@ -1,77 +1,38 @@
 # @thryx/mcp-server
 
-**The AI Agent Launchpad** -- Model Context Protocol server for [ThryxProtocol](https://thryx.xyz) on Base.
+**The AI Agent Launchpad** — Model Context Protocol server for [ThryxProtocol](https://thryx.fun) on Base.
 
-Any AI agent (Claude, GPT, custom agents) can launch tokens, trade on bonding curves, claim fees, scan portfolios, and check token safety -- all through native MCP tools. Zero cost per launch (gas only, ~$0.01 on Base).
+Launch ERC-20 tokens, trade on bonding curves or graduated Uniswap V4 pools, claim creator + referral fees, scan portfolios, and discover trending / graduating / safety-scored tokens — through 21 native MCP tools.
 
-**150+ tokens launched across 4 protocol versions. Verified Diamond proxy on Base mainnet.**
-
-**Early user bonus: First 10 new addresses that launch or trade automatically receive THRYX rewards. No claiming needed -- rewards arrive in your wallet instantly.**
+**v3.1 Diamond live on Base mainnet · 880+ tokens launched · V4-native default with anti-sniper hook · Gasless · Server-managed wallets · No private keys, no API bills.**
 
 ---
 
-## What's New (v1.2.0)
+## What's new in v1.5.0 (2026-05-05)
 
-- **Gasless launches via metaLaunch()** -- sign a message, relay pays gas. Zero ETH needed to launch a token.
-- **Simple buy()/sell() interface** -- send ETH to buy tokens, sell tokens to receive ETH. No need to acquire THRYX first.
-- **Real THRYX volume** -- every buy/sell generates real THRYX volume on the V4 Doppler pool
-- **Dynamic graduation threshold** -- ETH-denominated, auto-converts to THRYX at market rate
-- **Paymaster gas sponsorship** -- paymaster contract holds ETH/THRYX to cover gas for new users
-- **Relay** -- https://thryx-relay.thryx.workers.dev for gasless operations
-- **2 new tools** -- thryx_meta_launch, thryx_paymaster_stats
-- **15 total tools** -- up from 13
-
-### Previous (v1.0.3)
-
-- v2.4 Diamond proxy -- same address forever, verified on Basescan + Sourcify
-- 0.5% swap fees -- lowest on Base. 70% creator / 30% protocol
-- Auto-distributed fees -- creator fees paid instantly on every swap
-- Per-token ETH reserves -- each token has isolated reserves, safer graduation
-- Uniswap V4 graduation -- tokens graduate to V4 AMM
-- Early user THRYX rewards -- first 10 new users automatically earn THRYX
+- **Pure HTTP wrapper.** Every tool is one `fetch()` against `https://thryx.fun/api/*`. No local signing, no `ethers.js`, no toolkit-script dependency. Drop-in installable.
+- **Auto-registers a wallet on first run** if you don't set `THRYX_API_KEY`. Registration is one HTTP call, returns a fresh wallet + key + pre-sponsored gas in ~200ms. Saved to `~/.thryx-mcp/credentials.json` (mode 0600 on POSIX).
+- **21 tools all wired and verified** against the live launchpad. The smoke test runs real JSON-RPC frames over stdio and asserts specific fields per response — `SMOKE_TEST_REPORT.md` has the matrix.
+- **v3.1 facts** — V4-native by default since 2026-05-04, anti-sniper hook (80% → 1% over 60s), Token/THRYX pair so every trade pumps the reserve currency.
+- **Dropped:** `thryx_meta_launch` (redundant — `/api/launch` is gasless when called with `X-API-Key`), the `PRIVATE_KEY` config variable (not needed), `ethers` dependency.
 
 ---
 
-## Quick Start
-
-### npx (no install)
-
-```bash
-npx @thryx/mcp-server
-```
-
-### Global install
+## Install
 
 ```bash
 npm install -g @thryx/mcp-server
-thryx-mcp
+# Or use directly via npx — no install required:
+npx -y @thryx/mcp-server
 ```
+
+That's it. On first run with no `THRYX_API_KEY` set, the package auto-registers a fresh wallet and saves the credentials. No signup form, no email, no captcha.
 
 ---
 
-## Integration
+## Claude Desktop / Cursor / Windsurf
 
-### Claude Desktop
-
-Add to your `claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "thryx-protocol": {
-      "command": "npx",
-      "args": ["-y", "@thryx/mcp-server"],
-      "env": {
-        "PRIVATE_KEY": "your-wallet-private-key"
-      }
-    }
-  }
-}
-```
-
-### Claude Code
-
-Add to `~/.claude/settings.json` or project `.mcp.json`:
+Drop this into your MCP client config:
 
 ```json
 {
@@ -84,196 +45,106 @@ Add to `~/.claude/settings.json` or project `.mcp.json`:
 }
 ```
 
-### HTTP Mode (remote agents)
+Or with an explicit key:
+
+```json
+{
+  "mcpServers": {
+    "thryx": {
+      "command": "npx",
+      "args": ["-y", "@thryx/mcp-server"],
+      "env": { "THRYX_API_KEY": "thryx_..." }
+    }
+  }
+}
+```
+
+Restart your client and ask:
+- *"What tokens are graduating right now on THRYX?"*
+- *"Launch a token called Lab Notebook with symbol LABN. Use this image URL."*
+- *"What's the safety score on 0xb319FE7314ba1634B75dD831abC8f3cb8aeE87A3?"*
+
+---
+
+## Tools (21)
+
+### Discovery (no key required)
+| Tool | What it does |
+|---|---|
+| `thryx_about` | Protocol overview: Diamond address, agent surfaces, doc links. |
+| `thryx_info` | Detailed token info — price, supply, fees, graduation status, V4-native flag. |
+| `thryx_safety_score` | Token health score (0–100). |
+| `thryx_rug_check` | Rug-risk indicators: deployer, fee tier, anti-sniper window state. |
+| `thryx_recent_tokens` | Newest launches. |
+| `thryx_search` | Search by name / symbol / address. |
+| `thryx_trending` | Top trading activity in the last 6 hours. |
+| `thryx_graduating` | Tokens closest to graduating to Uniswap V4. |
+| `thryx_leaderboard` | Top traders + creators by volume / fees. |
+| `thryx_token_of_day` | Featured token of the day. |
+| `thryx_paymaster_stats` | Live paymaster ETH + THRYX balance, capacity. |
+| `thryx_stats_v2` | Platform-wide stats. |
+| `thryx_protocol_params` | Live protocol params (fee bps, graduation threshold, ETH rate). |
+
+### Account (X-API-Key required — auto-registered if absent)
+| Tool | What it does |
+|---|---|
+| `thryx_balance` | Your wallet balance + recommended next-action. |
+| `thryx_portfolio` | Full holdings scan with live PnL. |
+
+### Write — gasless on-chain via paymaster
+| Tool | What it does |
+|---|---|
+| `thryx_launch` | Launch a token (gasless). |
+| `thryx_buy` | Buy a token with ETH (gasless, slippage-protected). |
+| `thryx_sell` | Sell a token for ETH. |
+| `thryx_claim` | Claim accumulated creator fees. |
+| `thryx_set_referrer` | Set a referrer wallet for your account. |
+| `thryx_claim_referral` | Claim referral fees. |
+
+---
+
+## How it works
+
+1. **Auto-register.** On first run with no `THRYX_API_KEY`, the package POSTs to `https://thryx.fun/api/agent/register` and gets a fresh wallet + API key + pre-sponsored gas. Credentials are persisted at `~/.thryx-mcp/credentials.json`.
+2. **Every tool call is an authenticated HTTPS request** to `thryx.fun/api/*` with `X-API-Key`. The launchpad signs and submits the on-chain transactions on your behalf via its paymaster — you never see a private key, and you never pay gas.
+3. **Read tools** work even without a key (they hit public endpoints).
+
+---
+
+## Security
+
+- The API key is yours — store it like any other API token.
+- The auto-registered wallet is server-managed. The launchpad holds the encrypted keystore; you never touch the private key. To take custody, withdraw via `thryx_balance` → `POST /api/agent/withdraw` (separate flow, not yet a tool).
+- All requests are HTTPS to `thryx.fun`. The package never makes calls to any other host except the configurable `THRYX_BASE_URL` if you set it.
+
+---
+
+## Programmatic use (HTTP API directly)
+
+You don't need MCP at all if you'd rather skip it:
 
 ```bash
-npx @thryx/mcp-server --http 3100
+# Register
+curl -X POST https://thryx.fun/api/agent/register -H 'Content-Type: application/json' -d '{"name":"my-bot"}'
+
+# Use the returned apiKey on every subsequent call
+curl https://thryx.fun/api/agent/home -H "X-API-Key: thryx_..."
+curl -X POST https://thryx.fun/api/launch -H "X-API-Key: thryx_..." -H 'Content-Type: application/json' -d '{"name":"Test","symbol":"TST","image":"https://..."}'
 ```
 
-Endpoints:
-- `POST /mcp` -- MCP protocol endpoint (Streamable HTTP)
-- `GET /health` -- Health check
+The MCP package wraps this for clients that prefer a tool-call interface.
 
 ---
 
-## Tools (15 total)
+## Repo + issues
 
-### Read Tools (no wallet needed)
-
-| Tool | Description |
-|------|-------------|
-| `thryx_about` | Protocol overview: what ThryxProtocol is, how it works, gasless launches, buy/sell interface, relay, key addresses, available tools |
-| `thryx_info` | Token details: bonding curve state, price, graduation progress, fees, vesting. Or protocol overview if no token specified |
-| `thryx_balance` | Quick ETH + THRYX balance check for any wallet address |
-| `thryx_portfolio` | Full portfolio scan across all wallets: token holdings, ETH balances, USD values via Blockscout + Multicall3 + DexScreener |
-| `thryx_stats_v2` | Protocol-wide stats: total THRYX burned, graduation treasury collected |
-| `thryx_safety_score` | Rate any ThryxProtocol token 0-100 on safety (vesting, liquidity, distribution, activity). Can score all deployed tokens at once |
-| `thryx_rug_check` | Check ANY ERC20 on Base for rug signals: verification, honeypot, dangerous functions, ownership, liquidity, tax |
-| `thryx_paymaster_stats` | Check paymaster ETH/THRYX balance and gas sponsorship capacity. Shows estimated launches/swaps remaining |
-
-### Write Tools (wallet key required)
-
-| Tool | Description |
-|------|-------------|
-| `thryx_launch` | Deploy a new token on the bonding curve. 1B supply, 80% curve / 15% graduation LP / 5% creator vested 90 days. Gas only (~$0.01) |
-| `thryx_buy` | Buy tokens with ETH (default) or THRYX. Simple interface: send ETH, receive tokens. Protocol routes through V4 Doppler pool internally. 0.5% fee |
-| `thryx_sell` | Sell tokens for ETH. Simple interface: send tokens, receive ETH. Falls back to universal routing for non-Diamond tokens. Partial-sell fallback (100% > 50% > 25% > 10%) |
-| `thryx_meta_launch` | Gasless token launch via metaLaunch(). Returns EIP-712 signing data. Sign and POST to relay -- zero ETH needed |
-| `thryx_claim` | Claim accumulated creator or protocol fees from a token. Auto-detects v2.4 Diamond vs legacy factory |
-| `thryx_set_referrer` | Set a referrer address for a token. Referrer earns 5% of protocol fee share |
-| `thryx_claim_referral` | Claim accumulated referral fees (THRYX) |
-
----
-
-## Example Usage
-
-### Launch a token
-
-```
-> Use thryx_launch to create a token called "Autonomous Agent Token" with symbol "AAT"
-```
-
-The agent calls `thryx_launch` with `name: "Autonomous Agent Token"` and `symbol: "AAT"`. Returns the token address, tx hash, and bonding curve details.
-
-### Gasless launch (no ETH needed)
-
-```
-> Use thryx_meta_launch to create a gasless token called "Zero Gas Token" with symbol "ZGT"
-```
-
-Returns EIP-712 typed data to sign. Sign with your wallet, then POST the signature to the relay at `https://thryx-relay.thryx.workers.dev/meta-launch`. The relay submits the transaction and pays gas.
-
-### Buy tokens with ETH
-
-```
-> Use thryx_buy with token 0x1234...abcd and amount "0.01"
-```
-
-Sends 0.01 ETH to buy tokens on the bonding curve. Protocol handles THRYX routing internally -- you just send ETH.
-
-### Sell tokens for ETH
-
-```
-> Use thryx_sell with token 0x1234...abcd and amount "all"
-```
-
-Sells your entire token balance and returns ETH. Protocol handles THRYX routing internally.
-
-### Check paymaster capacity
-
-```
-> Use thryx_paymaster_stats to check gas sponsorship status
-```
-
-Returns paymaster ETH/THRYX balances and estimated number of sponsored launches and swaps remaining.
-
-### Check token safety
-
-```
-> Use thryx_rug_check to analyze 0x1234...abcd
-```
-
-Returns risk level (LOW/MEDIUM/HIGH/CRITICAL) with detailed analysis of contract verification, dangerous functions, ownership, liquidity, and honeypot indicators.
-
-### Scan portfolio
-
-```
-> Use thryx_portfolio to scan all wallets
-```
-
-Discovers tokens via Blockscout, reads balances via Multicall3, prices via DexScreener. Returns a full breakdown by wallet.
-
----
-
-## Environment Variables
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `PRIVATE_KEY` | Optional | Your wallet's private key. Needed for all write tools (launch, buy, sell, claim). Gasless launches still require signing but no ETH for gas. Read tools work without it. |
-
-**Gasless launches require no ETH.** Your wallet signs an EIP-712 message (needs private key), then the relay submits and the self-funding paymaster covers gas. The relay is self-sufficient — funded by 20% of all swap fees.
-
-Write tools (`thryx_launch`, `thryx_buy`, `thryx_sell`, `thryx_claim`, `thryx_set_referrer`, `thryx_claim_referral`) need wallet access for direct on-chain transactions. Read tools (`thryx_info`, `thryx_balance`, `thryx_portfolio`, `thryx_stats_v2`, `thryx_safety_score`, `thryx_rug_check`, `thryx_paymaster_stats`, `thryx_about`) query Base mainnet RPC directly and require no configuration.
-
----
-
-## How It Works
-
-Every token launched through ThryxProtocol:
-
-1. **Creates a bonding curve** -- virtual x*y=k curve paired with THRYX as the quote token
-2. **Tradeable immediately** -- buy/sell with ETH via simple `buy()`/`sell()` functions, no DEX listing needed
-3. **Generates real volume** -- every trade routes through the V4 Doppler pool, generating real THRYX volume
-4. **Generates fees** -- 0.5% per swap (30% protocol, 70% creator). 2% of protocol fees are burned
-5. **Graduates to AMM** -- at dynamic ETH-denominated threshold, migrates to Uniswap V4 with real liquidity
-6. **Locks THRYX** -- every launch permanently locks THRYX in the bonding curve = scarcity
-
-### v2.4 Diamond Features
-
-- **Gasless launches** -- `metaLaunch()` lets users sign off-chain, relay pays gas. Zero ETH to launch.
-- **Simple buy/sell** -- `buy(token)` with ETH, `sell(token, amount)` for ETH. Protocol handles THRYX routing internally.
-- **Real THRYX volume** -- every trade generates real volume on the V4 Doppler pool
-- **Dynamic graduation** -- ETH-denominated threshold auto-converts to THRYX at market rate
-- **Paymaster gas sponsorship** -- paymaster contract sponsors gas for new users
-- **Relay service** -- https://thryx-relay.thryx.workers.dev for gasless operations
-- Auto-distribute creator fees in every swap (no claiming needed)
-- 0.5% swap fees -- lowest on Base
-- Per-token ETH reserves for safer graduation
-- Per-token fee overrides for premium tokens
-- Bonding curve hardening (minimum reserve floor, overflow protection)
-- Same contract address forever via Diamond proxy (EIP-2535)
-- Referral system: referrers earn 5% of protocol fee share
-- 90-day linear vesting for creator tokens
-- Mandatory 10% slippage floor
-- 2% fee burn for deflationary THRYX pressure
-- Loyalty rebates for ecosystem holders
-
----
-
-## Network
-
-| | |
-|--|--|
-| **Chain** | Base mainnet (Chain ID 8453) |
-| **Protocol v2.4 Diamond** | `0x2F77b40c124645d25782CfBdfB1f54C1d76f2cCe` |
-| **Protocol v2.3 (legacy)** | `0x4f25b9ecC67dC597f35abaE6Fa495457EC82284B` |
-| **Protocol v2.2 (legacy)** | `0xcDC734c1AFC2822E0d7E332DC914c0a7311633bF` |
-| **THRYX Token** | `0xc07E889e1816De2708BF718683e52150C20F3BA3` |
-| **RPC** | `https://mainnet.base.org` |
-| **Explorer** | [basescan.org](https://basescan.org) |
-
----
-
-## Architecture
-
-The MCP server wraps the ThryxProtocol CLI toolkit (`scripts/toolkit/`), spawning each script as a child process with `--json --execute` flags. This means the server inherits all routing logic, safety checks, and fallback behavior:
-
-- NEVER_SELL guards for protected tokens
-- Partial-sell fallback (100% > 50% > 25% > 10%)
-- Multi-DEX aggregator routing (Odos, Kyberswap)
-- Rate limiting and RPC rotation
-- NonceManager for transaction safety
-
-```
-thryx_launch       -->  launch.js "Name" SYMBOL --wallet main --json --execute
-thryx_buy          -->  buy.js <token> <amount> --with eth --wallet main --json --execute
-thryx_sell         -->  swap-sell.js <token> all --wallet main --json --execute
-thryx_claim        -->  claim.js <token> --wallet main --json --execute
-thryx_info         -->  info.js [token] --json
-thryx_meta_launch  -->  (self-contained: returns EIP-712 signing data for relay submission)
-thryx_paymaster_stats  -->  (self-contained: reads paymaster balance via RPC)
-```
-
----
-
-## Related
-
-- [npx thryx](https://www.npmjs.com/package/thryx) -- standalone CLI for one-command token deploys
-- [ThryxProtocol](https://thryx.xyz) -- the launchpad protocol
-- [THRYX on DexScreener](https://dexscreener.com/base/0xc07E889e1816De2708BF718683e52150C20F3BA3) -- live THRYX token chart
+Source: https://github.com/lordbasilaiassistant-sudo/thryx-mcp-server  
+Issues: https://github.com/lordbasilaiassistant-sudo/thryx-launchpad/issues  
+Diamond proxy on Base: `0x2F77b40c124645d25782CfBdfB1f54C1d76f2cCe`  
+Launchpad: https://thryx.fun
 
 ---
 
 ## License
 
-MIT
+MIT.
