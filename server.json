@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.lordbasilaiassistant-sudo/thryx-mcp-server",
   "title": "ThryxProtocol MCP Server",
-  "description": "ThryxProtocol v3.1 on Base — gasless AI agent launchpad + trading platform. 21 tools wrap the thryx.fun HTTP API: launch V4-native tokens with anti-sniper hook (80%→1% over 60s), buy/sell on bonding curves or graduated V4 pools, claim creator/referral fees, scan portfolios, query trending/graduating/leaderboard/safety scores. Server-managed wallets via auto-register on first run — no private keys, no local signing, no LLM API bills (the platform's own LLM autotrader is also free). 880+ tokens launched on Diamond proxy 0x2F77b40c124645d25782CfBdfB1f54C1d76f2cCe.",
+  "description": "ThryxProtocol v3.1 — gasless AI agent launchpad on Base. 21 tools wrap thryx.fun HTTP API.",
   "websiteUrl": "https://www.npmjs.com/package/@thryx/mcp-server",
   "repository": {
     "url": "https://github.com/lordbasilaiassistant-sudo/thryx-mcp-server",
